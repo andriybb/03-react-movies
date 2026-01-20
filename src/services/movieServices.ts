@@ -2,7 +2,7 @@ import axios from 'axios';
 import type Movie from '../types/movie';
 import { myKey } from '../components/Axios/axios';
 import { BASE_URL } from '../components/Axios/axios';
-
+import toast from 'react-hot-toast';
 interface MoviesHttpResponse {
     results: Movie[];
     total_results: number;
@@ -21,13 +21,17 @@ const fetchMovies = async (query: string = '') => {
             },
             headers: {
                 Authorization: `Bearer ${myKey}`,
+                accept: 'application/json',
             },
         });
         
 
         return response.data.results;
-    } catch (error) {
-        console.error('Помилка при завантаженні фільмів:', error);
+    } catch {
+
+        toast.error("No movies found for your request.", {
+            position: 'top-right',
+          })
       
     };
 }

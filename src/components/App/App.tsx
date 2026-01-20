@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import SearchBar from '../SearchBar/SearchBar';
 import MovieGrid from '../MovieGrid/MovieGrid';
@@ -15,6 +16,7 @@ function App() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   const handleSearch = async (query: string) => {
+    if (!query.trim()) return;
     try {
       setIsLoading(true);
       setError(false); 
@@ -32,8 +34,8 @@ function App() {
       if (data) {
         setMovies(data);
       }
-    } catch {
-      setError(true); 
+    } catch  { 
+      setError(true);
       toast.error("Something went wrong. Please try again later.");
     } finally {
       setIsLoading(false);
@@ -42,19 +44,15 @@ function App() {
 
   
   const openModal = (movie: Movie) => setSelectedMovie(movie);
-  const closeModal = () => setSelectedMovie(null);
+  const closeModal = useCallback(() => setSelectedMovie(null), []);
 
   return (
-    <div>
+    <>
       <Toaster />
-      
       <SearchBar onSubmit={handleSearch} />
 
-
       {error && <ErrorMessage />}
-
       {isLoading && <Loader />}
-
 
       {movies.length > 0 && (
         <MovieGrid movies={movies} onSelect={openModal} />
@@ -63,7 +61,7 @@ function App() {
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={closeModal} />
       )}
-    </div>
+    </>
   );
 }
 

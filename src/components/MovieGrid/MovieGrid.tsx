@@ -1,6 +1,6 @@
 import css from './MovieGrid.module.css';
 import type Movie from '../../types/movie';
-import { BASE_URL } from '../Axios/axios';
+import { getImageUrl } from '../Axios/axios'; // використовуємо утилітарну функцію
 
 interface MovieGridProps {
   onSelect: (movie: Movie) => void;
@@ -8,23 +8,41 @@ interface MovieGridProps {
 }
 
 function MovieGrid({ movies, onSelect }: MovieGridProps) {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = "https://via.placeholder.com/500x750?text=No+Poster";
+  };
 
+  const handleKeyDown = (e: React.KeyboardEvent, movie: Movie) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelect(movie);
+    }
+  };
 
   return (
     <ul className={css.grid}>
       {movies.map((movie) => (
-        <li key={movie.id} className={css.item} onClick={() => onSelect(movie)}>
-          <div className={css.card}>
+        <li key={movie.id} className={css.item}>
+          <div 
+            className={css.card}
+            onClick={() => onSelect(movie)}
+            onKeyDown={(e) => handleKeyDown(e, movie)}
+            role="button"
+            tabIndex={0}
+            aria-label={`View details for ${movie.title || 'Unknown movie'}`}
+          >
             <img
               className={css.image}
-              src={movie.poster_path =`${BASE_URL}${movie.poster_path}` 
-                 
+              src={movie.poster_path 
+                ? getImageUrl(movie.poster_path, 'w500')
+                : "https://via.placeholder.com/500x750?text=No+Poster" 
               }
-              alt={movie.title}
+              alt={movie.title ? `${movie.title} poster` : 'Movie poster'}
               loading="lazy"
+              onError={handleImageError}
             />
             <div className={css.info}>
-              <h2 className={css.title}>{movie.title}</h2>
+              <h2 className={css.title}>{movie.title || 'Unknown Title'}</h2>
             </div>
           </div>
         </li>
