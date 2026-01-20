@@ -21,7 +21,7 @@ function SearchBar({ onSubmit }: SearchBarProps) {
     }
 
     onSubmit(query.trim());
-    formRef.current?.reset(); // Очищаємо форму після успішного submit
+    formRef.current?.reset(); 
   };
 
   return (

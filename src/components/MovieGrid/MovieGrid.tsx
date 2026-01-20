@@ -1,6 +1,6 @@
 import css from './MovieGrid.module.css';
 import type Movie from '../../types/movie';
-import { getImageUrl } from '../Axios/axios'; // використовуємо утилітарну функцію
+import { IMAGE_URL } from '../Axios/axios'; // використовуємо утилітарну функцію
 
 interface MovieGridProps {
   onSelect: (movie: Movie) => void;
@@ -33,10 +33,7 @@ function MovieGrid({ movies, onSelect }: MovieGridProps) {
           >
             <img
               className={css.image}
-              src={movie.poster_path 
-                ? getImageUrl(movie.poster_path, 'w500')
-                : "https://via.placeholder.com/500x750?text=No+Poster" 
-              }
+              src={`${IMAGE_URL}${movie.poster_path}`}
               alt={movie.title ? `${movie.title} poster` : 'Movie poster'}
               loading="lazy"
               onError={handleImageError}

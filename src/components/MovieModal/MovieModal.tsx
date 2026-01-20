@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type Movie from '../../types/movie';
-import { getImageUrl } from '../Axios/axios';
+import { IMAGE_URL } from '../Axios/axios';
 import css from './MovieModal.module.css';
 
 interface MovieModalProps {
@@ -81,10 +81,7 @@ function MovieModal({ movie, onClose }: MovieModalProps) {
         </button>
        
         <img
-          src={movie.backdrop_path 
-            ? getImageUrl(movie.backdrop_path, 'original')
-            : "https://via.placeholder.com/1280x720?text=No+Image"
-          }
+          src={`${IMAGE_URL}${movie.backdrop_path}`}
           alt={movie.title ? `${movie.title} backdrop` : 'Movie backdrop'}
           className={css.image}
           onError={handleImageError}
