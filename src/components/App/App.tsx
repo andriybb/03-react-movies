@@ -17,24 +17,28 @@ function App() {
 
   const handleSearch = async (query: string) => {
     if (!query.trim()) return;
+  
     try {
       setIsLoading(true);
       setError(false); 
       setMovies([]); 
+  
+      const data = await fetchMovies(query); 
+  
 
-      const data = await fetchMovies(query);
-
-      if (data && data.length === 0) {
+      if (data && data.results.length === 0) {
         toast.error("No movies found for your request.", {
           position: 'top-right',
         });
         return;
       }
-
-      if (data) {
-        setMovies(data);
+  
+      
+      if (data && data.results) {
+        setMovies(data.results);
       }
-    } catch  { 
+      
+    } catch { 
       setError(true);
       toast.error("Something went wrong. Please try again later.");
     } finally {
