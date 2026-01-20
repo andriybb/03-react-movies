@@ -1,4 +1,4 @@
-import { type FormEvent, useRef } from 'react';
+import { useRef } from 'react';
 import toast from 'react-hot-toast';
 import styles from "./SearchBar.module.css";
 
@@ -9,10 +9,7 @@ interface SearchBarProps {
 function SearchBar({ onSubmit }: SearchBarProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    const formData = new FormData(e.currentTarget);
+  const handleFormAction = (formData: FormData) => {
     const query = formData.get("query") as string;
 
     if (!query || query.trim().length < 2) {
@@ -21,25 +18,27 @@ function SearchBar({ onSubmit }: SearchBarProps) {
     }
 
     onSubmit(query.trim());
-    formRef.current?.reset(); 
+
+    formRef.current?.reset();
   };
 
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-      <a
-      className={styles.link}
-      href="https://www.themoviedb.org/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Powered by TMDB
-    </a>
+        <a
+          className={styles.link}
+          href="https://www.themoviedb.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Powered by TMDB
+        </a>
+
 
         <form 
           ref={formRef}
           className={styles.form} 
-          onSubmit={handleSubmit}
+          action={handleFormAction}
         >
           <input
             className={styles.input}
@@ -48,7 +47,7 @@ function SearchBar({ onSubmit }: SearchBarProps) {
             autoComplete="off"
             placeholder="Search movies..."
             aria-label="Search movies"
-            minLength={2}
+            autoFocus
           />
           <button 
             className={styles.button} 
