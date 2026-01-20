@@ -26,7 +26,9 @@ function App() {
       const data = await fetchMovies(query); 
   
 
-      if (data && data.results.length === 0) {
+      
+
+      if (data && data.length === 0) {
         toast.error("No movies found for your request.", {
           position: 'top-right',
         });
@@ -34,8 +36,8 @@ function App() {
       }
   
       
-      if (data && data.results) {
-        setMovies(data.results);
+      if (data && data) {
+        setMovies(data);
       }
       
     } catch { 

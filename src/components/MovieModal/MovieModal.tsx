@@ -1,112 +1,65 @@
-import { useEffect, useRef } from 'react';
-import type Movie from '../../types/movie';
-import { IMAGE_URL } from '../Axios/axios';
+import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import css from './MovieModal.module.css';
+import type Movie  from '../../types/movie';
 
 interface MovieModalProps {
-  onClose: () => void;
-  movie: Movie;
+    movie: Movie;
+    onClose: () => void;
 }
 
-function MovieModal({ movie, onClose }: MovieModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
+export default function MovieModal({ movie, onClose }: MovieModalProps) {
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = 'hidden';
 
-  useEffect(() => {
-    // Зберігаємо попередній активний елемент
-    const previousActiveElement = document.activeElement as HTMLElement;
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [onClose]);
 
-    // Фокусуємо кнопку закриття
-    closeButtonRef.current?.focus();
-
-    // Блокуємо скрол
-    document.body.style.overflow = "hidden";
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
+    const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
-      
-      // Повертаємо фокус на попередній елемент
-      previousActiveElement?.focus();
-    };
-  }, [onClose]);
-
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    e.currentTarget.src = "https://via.placeholder.com/1280x720?text=No+Image";
-  };
-
-  const formatDate = (date: string | undefined): string => {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const formatRating = (rating: number | undefined): string => {
-    if (rating === undefined || rating === null) return 'N/A';
-    return `${rating.toFixed(1)}/10`;
-  };
-
-  return (
-    <div 
-      className={css.backdrop} 
-      onClick={onClose}
-      role="dialog" 
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      <div 
-        className={css.modal} 
-        onClick={(e) => e.stopPropagation()}
-        ref={modalRef}
-      >
-        <button 
-          ref={closeButtonRef}
-          className={css.closeButton} 
-          onClick={onClose} 
-          aria-label="Close modal"
-          type="button"
+    return createPortal(
+        <div
+            className={css.backdrop}
+            onClick={handleBackdropClick}
+            role="dialog"
+            aria-modal="true"
         >
-          &times;
-        </button>
-       
-        <img
-          src={`${IMAGE_URL}${movie.backdrop_path}`}
-          alt={movie.title ? `${movie.title} backdrop` : 'Movie backdrop'}
-          className={css.image}
-          onError={handleImageError}
-        />
-        
-        <div className={css.content}>
-          <h2 id="modal-title" className={css.title}>
-            {movie.title || 'Unknown Title'}
-          </h2>
-          <p className={css.overview}>
-            {movie.overview || 'No overview available.'}
-          </p>
-          
-          <div className={css.details}>
-            <p>
-              <strong>Release Date:</strong> {formatDate(movie.release_date)}
-            </p>
-            <p>
-              <strong>Rating:</strong> {formatRating(movie.vote_average)}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+            <div className={css.modal}>
+                <button
+                    className={css.closeButton}
+                    onClick={onClose}
+                    aria-label="Close modal"
+                >
+                    &times;
+                </button>
+                <img
+                    src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+                    alt={movie.title}
+                    className={css.image}
+                />
+                <div className={css.content}>
+                    <h2>{movie.title}</h2>
+                    <p>{movie.overview}</p>
+                    <p>
+                        <strong>Release Date:</strong> {movie.release_date}
+                    </p>
+                    <p>
+                        <strong>Rating:</strong> {movie.vote_average}/10
+                    </p>
+                </div>
+            </div>
+        </div>,
+        document.body,
+    );
 }
-
-export default MovieModal;
